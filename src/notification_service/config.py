@@ -34,9 +34,9 @@ class PostgresSettings(BaseSettings):
         extra="ignore",
     )
 
-    db_name: str
-    user: str
-    password: str
+    db_name: str = "db_name"
+    user: str = "user"
+    password: str = "password"
     host: str = "postgres"
     port: int = 5432
 
@@ -56,8 +56,8 @@ class RabbitMQSettings(BaseSettings):
         extra="ignore",
     )
 
-    user: str
-    password: str
+    user: str = "user"
+    password: str = "pass"
     host: str = "rabbitmq"
     port: int = 5672
 
@@ -72,8 +72,8 @@ class RabbitMQSettings(BaseSettings):
 class Settings:
     def __init__(self) -> None:
         self.application = ApplicationSettings()
-        self.postgres = PostgresSettings()  # type: ignore[call-arg]
-        self.rabbitmq = RabbitMQSettings()  # type: ignore[call-arg]
+        self.postgres = PostgresSettings()
+        self.rabbitmq = RabbitMQSettings()
 
 
 @lru_cache
