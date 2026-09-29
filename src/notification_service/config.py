@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Literal
 
 from pydantic import AmqpDsn, PostgresDsn
@@ -75,4 +76,6 @@ class Settings:
         self.rabbitmq = RabbitMQSettings()  # type: ignore[call-arg]
 
 
-settings = Settings()
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
