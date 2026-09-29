@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 
+from notification_service.config import settings
+
 app = FastAPI(
-    title="Notification service",
+    title=settings.application.app_name,
+    debug=settings.application.debug
 )
 
 
