@@ -1,5 +1,5 @@
-[![codecov](https://codecov.io/gh/USER/REPOSITORY/graph/badge.svg)](
-  https://codecov.io/gh/USER/REPOSITORY
+[![codecov](https://codecov.io/gh/bespalov92/notification-service/graph/badge.svg)](
+  https://codecov.io/gh/bespalov92/notification-service
 )
 
 # Notification Service
