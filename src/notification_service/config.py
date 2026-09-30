@@ -41,7 +41,7 @@ class PostgresSettings(BaseSettings):
     port: int = 5432
 
     @property
-    def url(self) -> PostgresDsn:
+    def dsn(self) -> PostgresDsn:
         return PostgresDsn(
             f"postgresql+asyncpg://"
             f"{self.user}:{self.password}"
@@ -62,7 +62,7 @@ class RabbitMQSettings(BaseSettings):
     port: int = 5672
 
     @property
-    def url(self) -> AmqpDsn:
+    def dsn(self) -> AmqpDsn:
         return AmqpDsn(
             f"amqp://{self.user}:{self.password}"
             f"@{self.host}:{self.port}/"

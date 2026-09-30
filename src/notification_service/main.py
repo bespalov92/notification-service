@@ -1,12 +1,24 @@
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
-from notification_service.config import ApplicationSettings
+from notification_service.config import get_settings
+from notification_service.db.session import dispose_database
 
-app_settings = ApplicationSettings()
+settings = get_settings()
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
+    yield
+    await dispose_database()
+
 
 app = FastAPI(
-    title=app_settings.app_name,
-    debug=app_settings.debug
+    title=settings.application.app_name,
+    debug=settings.application.debug,
+    lifespan=lifespan
 )
 
 
