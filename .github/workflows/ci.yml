@@ -36,4 +36,12 @@ jobs:
         run: uv run mypy
 
       - name: Pytest
-        run: uv run pytest
+        run: |
+          uv run pytest \
+            --cov=src \
+            --cov-report=xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
