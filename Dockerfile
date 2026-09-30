@@ -9,7 +9,7 @@ COPY pyproject.toml uv.lock README.md ./
 
 RUN uv sync --frozen --no-dev
 
-COPY src ./src
+COPY . .
 
 RUN groupadd --system app \
     && useradd --system --gid app app

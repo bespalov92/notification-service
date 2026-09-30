@@ -37,7 +37,7 @@ class PostgresSettings(BaseSettings):
     db_name: str = "db_name"
     user: str = "user"
     password: str = "password"
-    host: str = "postgres"
+    host: str = "localhost"
     port: int = 5432
 
     @property
