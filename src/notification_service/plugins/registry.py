@@ -1,6 +1,6 @@
 from notification_service.domain.enums import NotificationChannel
 from notification_service.plugins.base import NotificationPlugin
-from notification_service.plugins.errors import (
+from notification_service.plugins.exceptions import (
     PluginAlreadyRegisteredError,
     PluginNotFoundError,
 )

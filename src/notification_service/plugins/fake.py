@@ -1,5 +1,5 @@
 from notification_service.domain.enums import NotificationChannel
-from notification_service.plugins.errors import InvalidPayloadError
+from notification_service.plugins.exceptions import InvalidPayloadError
 
 
 class FakePlugin:
@@ -30,3 +30,6 @@ class FakePlugin:
             raise InvalidPayloadError(
                 "payload.attachments is only allowed for email"
             )
+
+    async def send(self) -> None:
+        pass
