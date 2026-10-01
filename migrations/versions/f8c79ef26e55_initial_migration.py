@@ -24,57 +24,57 @@ def upgrade() -> None:
     op.create_table('notifications',
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('channel', sa.String(length=32), nullable=False),
-    sa.Column('priority', sa.SmallInteger(), server_default=sa.text('5'), nullable=False),
-    sa.Column('status', sa.String(length=32), server_default=sa.text("'queued'"), nullable=False),
-    sa.Column('payload', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+    sa.Column('priority', sa.SmallInteger(), server_default=sa.text('5'), nullable=False),  # noqa: E501
+    sa.Column('status', sa.String(length=32), server_default=sa.text("'queued'"), nullable=False),  # noqa: E501
+    sa.Column('payload', postgresql.JSONB(astext_type=sa.Text()), nullable=False),  # noqa: E501
     sa.Column('idempotency_key', sa.String(length=255), nullable=True),
-    sa.Column('attempts_count', sa.SmallInteger(), server_default=sa.text('0'), nullable=False),
-    sa.Column('max_attempts', sa.SmallInteger(), server_default=sa.text('3'), nullable=False),
+    sa.Column('attempts_count', sa.SmallInteger(), server_default=sa.text('0'), nullable=False),  # noqa: E501
+    sa.Column('max_attempts', sa.SmallInteger(), server_default=sa.text('3'), nullable=False),  # noqa: E501
     sa.Column('next_attempt_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('expires_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('dead_lettered_at', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.CheckConstraint('attempts_count >= 0', name='ck_notifications_attempts_count_non_negative'),
-    sa.CheckConstraint('max_attempts > 0', name='ck_notifications_max_attempts_positive'),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),  # noqa: E501
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),  # noqa: E501
+    sa.CheckConstraint('attempts_count >= 0', name='ck_notifications_attempts_count_non_negative'),  # noqa: E501
+    sa.CheckConstraint('max_attempts > 0', name='ck_notifications_max_attempts_positive'),  # noqa: E501
     sa.PrimaryKeyConstraint('id', name=op.f('pk_notifications')),
-    sa.UniqueConstraint('idempotency_key', name=op.f('uq_notifications_idempotency_key'))
+    sa.UniqueConstraint('idempotency_key', name=op.f('uq_notifications_idempotency_key'))  # noqa: E501
     )
-    op.create_index('ix_notifications_queue_order', 'notifications', ['priority', 'created_at'], unique=False, postgresql_where=sa.text("status = 'queued'"))
+    op.create_index('ix_notifications_queue_order', 'notifications', ['priority', 'created_at'], unique=False, postgresql_where=sa.text("status = 'queued'"))  # noqa: E501
     op.create_table('attempts',
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('notification_id', sa.Uuid(), nullable=False),
     sa.Column('channel', sa.String(length=32), nullable=False),
     sa.Column('provider', sa.String(length=100), nullable=False),
     sa.Column('status', sa.String(length=32), nullable=False),
-    sa.Column('retryable', sa.Boolean(), server_default=sa.text('false'), nullable=False),
-    sa.Column('response', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('retryable', sa.Boolean(), server_default=sa.text('false'), nullable=False),  # noqa: E501
+    sa.Column('response', postgresql.JSONB(astext_type=sa.Text()), nullable=True),  # noqa: E501
     sa.Column('error', sa.Text(), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['notification_id'], ['notifications.id'], name=op.f('fk_attempts_notification_id_notifications'), ondelete='CASCADE'),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),  # noqa: E501
+    sa.ForeignKeyConstraint(['notification_id'], ['notifications.id'], name=op.f('fk_attempts_notification_id_notifications'), ondelete='CASCADE'),  # noqa: E501
     sa.PrimaryKeyConstraint('id', name=op.f('pk_attempts'))
     )
-    op.create_index('ix_attempts_notification_created', 'attempts', ['notification_id', 'created_at'], unique=False)
+    op.create_index('ix_attempts_notification_created', 'attempts', ['notification_id', 'created_at'], unique=False)  # noqa: E501
     op.create_table('outbox_events',
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('notification_id', sa.Uuid(), nullable=False),
-    sa.Column('available_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('available_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),  # noqa: E501
     sa.Column('published_at', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['notification_id'], ['notifications.id'], name=op.f('fk_outbox_events_notification_id_notifications'), ondelete='CASCADE'),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),  # noqa: E501
+    sa.ForeignKeyConstraint(['notification_id'], ['notifications.id'], name=op.f('fk_outbox_events_notification_id_notifications'), ondelete='CASCADE'),  # noqa: E501
     sa.PrimaryKeyConstraint('id', name=op.f('pk_outbox_events'))
     )
-    op.create_index('ix_outbox_events_unpublished', 'outbox_events', ['available_at', 'created_at'], unique=False, postgresql_where=sa.text('published_at IS NULL'))
+    op.create_index('ix_outbox_events_unpublished', 'outbox_events', ['available_at', 'created_at'], unique=False, postgresql_where=sa.text('published_at IS NULL'))  # noqa: E501
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_index('ix_outbox_events_unpublished', table_name='outbox_events', postgresql_where=sa.text('published_at IS NULL'))
+    op.drop_index('ix_outbox_events_unpublished', table_name='outbox_events', postgresql_where=sa.text('published_at IS NULL'))  # noqa: E501
     op.drop_table('outbox_events')
     op.drop_index('ix_attempts_notification_created', table_name='attempts')
     op.drop_table('attempts')
-    op.drop_index('ix_notifications_queue_order', table_name='notifications', postgresql_where=sa.text("status = 'queued'"))
+    op.drop_index('ix_notifications_queue_order', table_name='notifications', postgresql_where=sa.text("status = 'queued'"))  # noqa: E501
     op.drop_table('notifications')
     # ### end Alembic commands ###
