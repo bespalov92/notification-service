@@ -1,4 +1,4 @@
-class NotificationError(Exception):
+class NotificationAppError(Exception):
     """
     A common exception class for the application.
 
