@@ -7,7 +7,7 @@ class NotificationPlugin(Protocol):
     channel: NotificationChannel
     provider_name: str
 
-    def validate(self) -> None:
+    def validate(self, payload: dict[str, object]) -> None:
         pass
 
     async def send(self) -> None:
