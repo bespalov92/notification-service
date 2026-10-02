@@ -13,7 +13,6 @@ from notification_service.domain.enums import (
 class CreateNotificationRequest(ApiSchema):
     channel: NotificationChannel = Field(
         description="Channel used to deliver the notification",
-        examples=["email", "sms", "push"]
     )
 
     priority: int = Field(
@@ -53,12 +52,10 @@ class NotificationResponse(ApiSchema):
 
     channel: NotificationChannel = Field(
         description="Channel used to deliver the notification",
-        examples=["email", "sms", "push"]
     )
 
     status: NotificationStatus = Field(
         description="Current notification status",
-        examples=["queued", "sent"]
     )
 
     created_at: datetime = Field(
