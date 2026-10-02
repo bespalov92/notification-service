@@ -5,7 +5,7 @@ import pytest
 from pydantic import ValidationError
 
 from notification_service.api.schemas.common import ApiError, ApiResponse
-from notification_service.api.schemas.notifications import (
+from notification_service.api.schemas.notification import (
     CreateNotificationRequest,
     NotificationResponse,
 )
