@@ -50,7 +50,7 @@ async def create_notification(
 
 
 @router.get(
-    "/{notification_id}",
+    "/{notification_id:uuid}",
     response_model=ApiResponse[NotificationResponse],
     responses={
         status.HTTP_404_NOT_FOUND: {
