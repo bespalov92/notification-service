@@ -18,7 +18,15 @@ router = APIRouter(prefix="/api/v1/notifications", tags=["notifications"])
 @router.post(
     "",
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=ApiResponse[NotificationResponse]
+    response_model=ApiResponse[NotificationResponse],
+    responses={
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
+            "model": ApiResponse[None],
+            "description": (
+                "Request structure or payload validation failed"
+            ),
+        },
+    },
 )
 async def create_notification(
     request: CreateNotificationRequest,
