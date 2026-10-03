@@ -3,6 +3,9 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from notification_service.api.exception_handlers import (
+    register_exception_handler,
+)
 from notification_service.api.routers.notification import (
     router as notification_router,
 )
@@ -24,6 +27,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+register_exception_handler(app)
 app.include_router(notification_router)
 
 
