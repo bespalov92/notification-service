@@ -1,41 +1,24 @@
-from collections.abc import AsyncGenerator
 from uuid import uuid4
 
-from httpx import ASGITransport, AsyncClient, Response
+from httpx import AsyncClient, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from notification_service.db.models.notification import Notification
-from notification_service.db.session import get_session
-from notification_service.main import app
 
 
 async def post_notification(
-    db_session: AsyncSession,
-    request_body: dict[str, object],
+    api_client: AsyncClient,
+    request_body: dict[str, object]
 ) -> Response:
-    async def override_get_session() -> AsyncGenerator[AsyncSession]:
-        yield db_session
-
-    app.dependency_overrides[get_session] = override_get_session
-
-    transport = ASGITransport(app=app)
-
-    try:
-        async with AsyncClient(
-            transport=transport,
-            base_url="http://test",
-        ) as client:
-            return await client.post(
-                "/api/v1/notifications",
-                json=request_body,
-            )
-    finally:
-        app.dependency_overrides.clear()
+    return await api_client.post(
+        "/api/v1/notifications",
+        json=request_body,
+    )
 
 
 async def test_error_for_invalid_request(
-    db_session: AsyncSession,
+    api_client: AsyncClient
 ) -> None:
     request_body: dict[str, object] = {
         "channel": "email",
@@ -45,7 +28,7 @@ async def test_error_for_invalid_request(
         },
     }
 
-    response = await post_notification(db_session, request_body)
+    response = await post_notification(api_client, request_body)
 
     assert response.status_code == 422
 
@@ -63,7 +46,8 @@ async def test_error_for_invalid_request(
 
 
 async def test_error_for_invalid_plugin_payload(
-    db_session: AsyncSession,
+    api_client: AsyncClient,
+    db_session: AsyncSession
 ) -> None:
     idempotency_key = f"api-{uuid4()}"
     request_body: dict[str, object] = {
@@ -75,7 +59,7 @@ async def test_error_for_invalid_plugin_payload(
         },
     }
 
-    response = await post_notification(db_session, request_body)
+    response = await post_notification(api_client, request_body)
 
     assert response.status_code == 422
     assert response.json() == {

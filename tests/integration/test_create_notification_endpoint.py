@@ -1,25 +1,16 @@
-from collections.abc import AsyncGenerator
 from uuid import uuid4
 
-from httpx import ASGITransport, AsyncClient
+from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from notification_service.db.models.outbox_event import OutboxEvent
-from notification_service.db.session import get_session
-from notification_service.main import app
 
 
 async def test_create_notification_endpoint(
+    api_client: AsyncClient,
     db_session: AsyncSession
 ) -> None:
-    async def override_get_session() -> AsyncGenerator[AsyncSession]:
-        yield db_session
-
-    app.dependency_overrides[get_session] = override_get_session
-
-    transport = ASGITransport(app=app)
-
     request_body = {
         "channel": "email",
         "priority": 2,
@@ -30,17 +21,10 @@ async def test_create_notification_endpoint(
         }
     }
 
-    try:
-        async with AsyncClient(
-            transport=transport,
-            base_url="http://test"
-        ) as client:
-            response = await client.post(
-                "/api/v1/notifications",
-                json=request_body
-            )
-    finally:
-        app.dependency_overrides.clear()
+    response = await api_client.post(
+        "/api/v1/notifications",
+        json=request_body
+    )
 
     assert response.status_code == 202
 

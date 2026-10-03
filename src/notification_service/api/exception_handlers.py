@@ -10,6 +10,7 @@ from notification_service.api.schemas.common import (
 from notification_service.plugins.exceptions import (
     InvalidPayloadError,
 )
+from notification_service.services.exceptions import NotificationNotFoundError
 
 
 async def request_validation_error_handler(
@@ -47,6 +48,23 @@ async def invalid_payload_error_handler(
     )
 
 
+async def notification_not_found_error_handler(
+    _request: Request,
+    exc: NotificationNotFoundError,
+) -> JSONResponse:
+    response = ApiResponse[None](
+        error=ApiError(
+            code="notification_not_found",
+            message=str(exc),
+        ),
+    )
+
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content=response.model_dump(mode="json"),
+    )
+
+
 def register_exception_handler(app: FastAPI) -> None:
     app.exception_handler(RequestValidationError)(
         request_validation_error_handler
@@ -54,4 +72,8 @@ def register_exception_handler(app: FastAPI) -> None:
 
     app.exception_handler(InvalidPayloadError)(
         invalid_payload_error_handler
+    )
+
+    app.exception_handler(NotificationNotFoundError)(
+        notification_not_found_error_handler
     )

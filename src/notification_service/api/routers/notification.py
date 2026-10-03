@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 
@@ -45,4 +46,28 @@ async def create_notification(
 
     return ApiResponse(
         data=NotificationResponse.model_validate(notification),
+    )
+
+
+@router.get(
+    "/{notification_id}",
+    response_model=ApiResponse[NotificationResponse],
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ApiResponse[None],
+            "description": "Notification not found",
+        },
+    },
+)
+async def get_notification(
+    notification_id: UUID,
+    service: Annotated[
+        NotificationService,
+        Depends(get_notification_service),
+    ]
+) -> ApiResponse[NotificationResponse]:
+    notification = await service.get_by_id(notification_id)
+
+    return ApiResponse(
+        data=NotificationResponse.model_validate(notification)
     )

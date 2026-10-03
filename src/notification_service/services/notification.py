@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +13,7 @@ from notification_service.db.repositories.outbox_event import (
 )
 from notification_service.domain.enums import NotificationChannel
 from notification_service.plugins.registry import PluginRegistry
+from notification_service.services.exceptions import NotificationNotFoundError
 
 
 class  NotificationService:
@@ -64,5 +66,15 @@ class  NotificationService:
 
             event = OutboxEvent(notification_id = notification.id)
             await self._outbox_repository.add(event)
+
+        return notification
+
+    async def get_by_id(self, notification_id: UUID) -> Notification:
+        notification = await self._notification_repository.get_by_id(
+            notification_id
+        )
+
+        if notification is None:
+            raise NotificationNotFoundError(notification_id)
 
         return notification
