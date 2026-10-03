@@ -14,7 +14,6 @@ from notification_service.db.repositories.outbox_event import (
 )
 
 
-@pytest.mark.asyncio
 async def test_add_outbox_event(
     db_session: AsyncSession,
 ) -> None:

@@ -25,7 +25,6 @@ def create_notification(
     )
 
 
-@pytest.mark.asyncio
 async def test_idempotency_key_must_be_unique(
     db_session: AsyncSession,
 ) -> None:
@@ -41,7 +40,6 @@ async def test_idempotency_key_must_be_unique(
         await repository.add(second_notification)
 
 
-@pytest.mark.asyncio
 async def test_attempts_count_cannot_be_negative(
     db_session: AsyncSession,
 ) -> None:
@@ -52,7 +50,6 @@ async def test_attempts_count_cannot_be_negative(
         await repository.add(notification)
 
 
-@pytest.mark.asyncio
 async def test_max_attempts_must_be_positive(
     db_session: AsyncSession,
 ) -> None:

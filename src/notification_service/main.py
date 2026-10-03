@@ -3,6 +3,9 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from notification_service.api.routers.notification import (
+    router as notification_router,
+)
 from notification_service.config import get_settings
 from notification_service.db.session import dispose_database
 
@@ -20,6 +23,8 @@ app = FastAPI(
     debug=settings.application.debug,
     lifespan=lifespan
 )
+
+app.include_router(notification_router)
 
 
 @app.get("/health", tags=["health"], include_in_schema=False)

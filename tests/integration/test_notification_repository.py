@@ -1,6 +1,5 @@
 from uuid import uuid4
 
-import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from notification_service.db.models.notification import Notification
@@ -20,7 +19,6 @@ def create_notification() -> Notification:
     )
 
 
-@pytest.mark.asyncio
 async def test_add_and_get_notification_by_id(
     db_session: AsyncSession,
 ) ->  None:
@@ -38,7 +36,6 @@ async def test_add_and_get_notification_by_id(
     assert stored_notification.status == "queued"
 
 
-@pytest.mark.asyncio
 async def test_get_notification_by_idempotency_key(
     db_session: AsyncSession
 ) -> None:

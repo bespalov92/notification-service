@@ -24,7 +24,6 @@ def create_service(
     return NotificationService(session=session, plugin_registry=registry)
 
 
-@pytest.mark.asyncio
 async def test_create_notification_with_outbox_event(
     db_session: AsyncSession
 ) -> None:
@@ -53,7 +52,6 @@ async def test_create_notification_with_outbox_event(
     assert stored_event.notification_id == notification.id
 
 
-@pytest.mark.asyncio
 async def test_idempotency_returns_existing_notification(
     db_session: AsyncSession,
 ) -> None:
@@ -85,7 +83,6 @@ async def test_idempotency_returns_existing_notification(
     assert events_count == 1
 
 
-@pytest.mark.asyncio
 async def test_invalid_payload_is_not_persisted(
     db_session: AsyncSession,
 ) -> None:
