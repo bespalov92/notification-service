@@ -81,16 +81,31 @@ async def test_get_unpublished_events_returns_ready_events(
         available_at=now - timedelta(minutes=3),
         published_at=now,
     )
+    active_lease_event = OutboxEvent(
+        notification_id=notification.id,
+        available_at=now - timedelta(minutes=5),
+        locked_until=now + timedelta(minutes=5),
+    )
+    expired_lease_event = OutboxEvent(
+        notification_id=notification.id,
+        available_at=now - timedelta(minutes=3),
+        locked_until=now - timedelta(minutes=1),
+    )
 
     for event in (
         first_ready_event,
         second_ready_event,
         future_event,
         published_event,
+        active_lease_event,
+        expired_lease_event
     ):
         await repository.add(event)
 
-    events = await repository.get_unpublished_events(limit=1000)
+    events = await repository.get_unpublished_events(
+        limit=1000,
+        lease_duration=timedelta(minutes=5)
+    )
 
     notification_events = [
         event
@@ -99,9 +114,13 @@ async def test_get_unpublished_events_returns_ready_events(
     ]
 
     assert [event.id for event in notification_events] == [
+        expired_lease_event.id,
         first_ready_event.id,
         second_ready_event.id,
     ]
+
+    for event in notification_events:
+        assert event.locked_until is not None
 
 
 async def test_mark_published(
@@ -128,3 +147,4 @@ async def test_mark_published(
 
     assert stored_event is not None
     assert stored_event.published_at == published_at
+    assert stored_event.locked_until is None
