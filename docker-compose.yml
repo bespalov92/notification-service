@@ -3,6 +3,7 @@ name: notification-service
 services:
   api:
     build:
+      dockerfile: Dockerfile
       context: .
     init: true
     env_file:
@@ -13,6 +14,30 @@ services:
       - "8000:8000"
     volumes:
       - ./src:/app/src:ro
+
+  worker:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    init: true
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      PYTHONPATH: /app/src
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./src:/app/src:ro
+    command:
+      [
+        "celery",
+        "-A",
+        "notification_service.messaging.celery_app:celery_app",
+        "worker",
+        "--loglevel=INFO",
+        "--queues=notifications",
+      ]
 
   postgres:
     image: postgres:17-alpine

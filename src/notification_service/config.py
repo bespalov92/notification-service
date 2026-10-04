@@ -65,7 +65,7 @@ class RabbitMQSettings(BaseSettings):
     def dsn(self) -> AmqpDsn:
         return AmqpDsn(
             f"amqp://{self.user}:{self.password}"
-            f"@{self.host}:{self.port}/"
+            f"@{self.host}:{self.port}//"
         )
 
 
