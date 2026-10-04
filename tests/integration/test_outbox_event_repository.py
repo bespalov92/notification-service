@@ -54,6 +54,7 @@ async def test_add_outbox_event(
     assert stored_event.notification_id == notification.id
     assert stored_event.available_at is not None
     assert stored_event.published_at is None
+    assert stored_event.locked_until is None
 
 
 async def test_get_unpublished_events_returns_ready_events(

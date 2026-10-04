@@ -47,6 +47,10 @@ class OutboxEvent(Base):
         server_default=func.now(),
     )
 
+    locked_until: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+    )
+
     published_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
     )
