@@ -16,7 +16,7 @@ from notification_service.plugins.registry import PluginRegistry
 from notification_service.services.exceptions import NotificationNotFoundError
 
 
-class  NotificationService:
+class NotificationService:
     def __init__(
         self,
         session: AsyncSession,
