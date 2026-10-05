@@ -14,6 +14,7 @@ class FakePlugin:
     ) -> None:
         self.channel = channel
         self.provider_name = provider_name
+        self.sent_payloads: list[dict[str, object]] = []
 
     def validate(self, payload: dict[str, object]) -> None:
         message = payload.get("message")
@@ -31,5 +32,5 @@ class FakePlugin:
                 "payload.attachments is only allowed for email"
             )
 
-    async def send(self) -> None:
-        pass
+    async def send(self, payload: dict[str, object]) -> None:
+        self.sent_payloads.append(payload.copy())

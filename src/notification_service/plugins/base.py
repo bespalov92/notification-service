@@ -10,5 +10,5 @@ class NotificationPlugin(Protocol):
     def validate(self, payload: dict[str, object]) -> None:
         pass
 
-    async def send(self) -> None:
+    async def send(self, payload: dict[str, object]) -> None:
         pass
