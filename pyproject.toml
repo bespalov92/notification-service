@@ -41,6 +41,7 @@ extend-select = ["W292"]
 [tool.mypy]
 python_version = "3.13"
 strict = true
+mypy_path = "src"
 files = ["src", "tests"]
 
 [tool.pytest.ini_options]

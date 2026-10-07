@@ -27,3 +27,11 @@ class PluginNotFoundError(NotificationServiceError):
     def __init__(self, channel: NotificationChannel) -> None:
         self.channel = channel
         super().__init__(f"No plugin registered for channel: {channel}")
+
+
+class PluginSendError(NotificationServiceError):
+    """Raised when a plugin cannot send a notification"""
+
+    def __init__(self, message: str, *, retryable: bool) -> None:
+        self.retryable = retryable
+        super().__init__(message)
