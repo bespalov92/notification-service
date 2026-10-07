@@ -18,5 +18,8 @@ celery_app.conf.update(
         "notification_service.messaging.healthcheck": {
             "queue": "notifications",
         },
+        "notification_service.messaging.deliver_notification": {
+            "queue": "notifications",
+        },
     },
 )
