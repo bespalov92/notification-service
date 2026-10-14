@@ -61,3 +61,38 @@ class NotificationResponse(ApiSchema):
     created_at: datetime = Field(
         description="Date and time when the notification was created",
     )
+
+
+class NotificationListParams(ApiSchema):
+    limit: int = Field(
+        default=20,
+        ge=1,
+        le=100,
+        description="Maximum number of notifications to return",
+    )
+
+    offset: int = Field(
+        default=0,
+        ge=0,
+        description="Number of notifications to skip",
+    )
+
+    channel: NotificationChannel | None = Field(
+        default=None,
+        description="Filter by delivery channel",
+    )
+
+    status: NotificationStatus | None = Field(
+        default=None,
+        description="Filter by current status",
+    )
+
+    created_from: datetime | None = Field(
+        default=None,
+        description="Created at or after this time",
+    )
+
+    created_to: datetime | None = Field(
+        default=None,
+        description="Created at or before this time",
+    )

@@ -11,7 +11,7 @@ from notification_service.db.repositories.notification import (
 from notification_service.db.repositories.outbox_event import (
     OutboxEventRepository,
 )
-from notification_service.domain.enums import NotificationChannel
+from notification_service.domain.enums import NotificationChannel, NotificationStatus
 from notification_service.plugins.registry import PluginRegistry
 from notification_service.services.exceptions import NotificationNotFoundError
 
@@ -84,8 +84,16 @@ class NotificationService:
         *,
         limit: int,
         offset: int,
+        channel: NotificationChannel | None,
+        status: NotificationStatus | None,
+        created_from: datetime | None,
+        created_to: datetime | None,
     ) -> tuple[list[Notification], int]:
         return await self._notification_repository.get_page(
             limit=limit,
             offset=offset,
+            channel=channel,
+            status=status,
+            created_from=created_from,
+            created_to=created_to,
         )

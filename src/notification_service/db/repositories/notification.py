@@ -1,9 +1,11 @@
+from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from notification_service.db.models.notification import Notification
+from notification_service.domain.enums import NotificationChannel, NotificationStatus
 
 
 class NotificationRepository:
@@ -34,22 +36,45 @@ class NotificationRepository:
         self,
         *,
         limit: int,
-        offset: int
+        offset: int,
+        channel: NotificationChannel | None,
+        status: NotificationStatus | None,
+        created_from: datetime | None,
+        created_to: datetime | None,
     ) -> tuple[list[Notification], int]:
+        filters: list[ColumnElement[bool]] = []
+
+        if channel is not None:
+            filters.append(Notification.channel == channel.value)
+
+        if status is not None:
+            filters.append(Notification.status == status.value)
+
+        if created_from is not None:
+            filters.append(Notification.created_at >= created_from)
+
+        if created_to is not None:
+            filters.append(Notification.created_at <= created_to)
+
         stmt = (
             select(Notification)
+            .where(*filters)
             .order_by(
                 Notification.created_at.desc(),
-                Notification.id.desc()
+                Notification.id.desc(),
             )
             .limit(limit)
             .offset(offset)
         )
 
-        notifications = list((await self._session.scalars(stmt)).all())
+        notifications = list(
+            (await self._session.scalars(stmt)).all()
+        )
 
         total = await self._session.scalar(
-            select(func.count()).select_from(Notification)
+            select(func.count())
+            .select_from(Notification)
+            .where(*filters)
         )
 
         return notifications, total or 0

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
@@ -9,7 +10,12 @@ from notification_service.api.dependencies import (
 from notification_service.api.schemas.common import ApiResponse
 from notification_service.api.schemas.notification import (
     CreateNotificationRequest,
+    NotificationListParams,
     NotificationResponse,
+)
+from notification_service.domain.enums import (
+    NotificationChannel,
+    NotificationStatus,
 )
 from notification_service.services.notification import NotificationService
 
@@ -58,21 +64,18 @@ async def list_notifications(
         NotificationService,
         Depends(get_notification_service),
     ],
-    limit: int = Query(
-        default=20,
-        ge=1,
-        le=100,
-        description="Maximum number of notifications to return",
-    ),
-    offset: int = Query(
-        default=0,
-        ge=0,
-        description="Number of notifications to skip",
-    ),
+    params: Annotated[
+        NotificationListParams,
+        Query()
+    ]
 ) -> ApiResponse[list[NotificationResponse]]:
     notifications, total = await service.get_page(
-        limit=limit,
-        offset=offset
+        limit=params.limit,
+        offset=params.offset,
+        channel=params.channel,
+        status=params.status,
+        created_from=params.created_from,
+        created_to=params.created_to,
     )
 
     return ApiResponse(
@@ -81,10 +84,10 @@ async def list_notifications(
             for notification in notifications
         ],
         meta={
-            "limit": limit,
-            "offset": offset,
-            "total": total
-        }
+            "limit": params.limit,
+            "offset": params.offset,
+            "total": total,
+        },
     )
 
 
