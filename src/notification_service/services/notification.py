@@ -18,6 +18,7 @@ from notification_service.domain.enums import (
 from notification_service.plugins.registry import PluginRegistry
 from notification_service.services.exceptions import (
     NotificationCannotBeCancelledError,
+    NotificationCannotBeRetriedError,
     NotificationNotFoundError,
 )
 
@@ -129,3 +130,28 @@ class NotificationService:
     async def cancel_all_queued(self) -> int:
         async with self._session.begin():
             return await self._notification_repository.cancel_all_queued()
+
+    async def retry(self, notification_id: UUID) -> Notification:
+        async with self._session.begin():
+            notification = await self._notification_repository.get_by_id(
+                notification_id
+            )
+
+            if notification is None:
+                raise NotificationNotFoundError(notification_id)
+
+            if notification.status != NotificationStatus.FAILED.value:
+                raise NotificationCannotBeRetriedError(
+                    notification_id,
+                    notification.status
+                )
+
+            notification.status = NotificationStatus.QUEUED.value
+            notification.attempts_count = 0
+            notification.next_attempt_at = None
+            notification.dead_lettered_at = None
+
+            event = OutboxEvent(notification_id=notification.id)
+            await self._outbox_repository.add(event)
+
+        return notification

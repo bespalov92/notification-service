@@ -12,6 +12,7 @@ from notification_service.plugins.exceptions import (
 )
 from notification_service.services.exceptions import (
     NotificationCannotBeCancelledError,
+    NotificationCannotBeRetriedError,
     NotificationNotFoundError,
 )
 
@@ -85,6 +86,23 @@ async def notification_cannot_be_cancelled_error_handler(
     )
 
 
+async def notification_cannot_be_retried_error_handler(
+    _request: Request,
+    exc: NotificationCannotBeRetriedError,
+) -> JSONResponse:
+    response = ApiResponse[None](
+        error=ApiError(
+            code="notification_cannot_be_retried",
+            message=str(exc),
+        ),
+    )
+
+    return JSONResponse(
+        status_code=status.HTTP_409_CONFLICT,
+        content=response.model_dump(mode="json"),
+    )
+
+
 def register_exception_handler(app: FastAPI) -> None:
     app.exception_handler(RequestValidationError)(
         request_validation_error_handler
@@ -100,4 +118,8 @@ def register_exception_handler(app: FastAPI) -> None:
 
     app.exception_handler(NotificationCannotBeCancelledError)(
         notification_cannot_be_cancelled_error_handler
+    )
+
+    app.exception_handler(NotificationCannotBeRetriedError)(
+        notification_cannot_be_retried_error_handler
     )

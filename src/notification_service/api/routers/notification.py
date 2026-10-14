@@ -111,6 +111,35 @@ async def get_notification(
     )
 
 
+@router.post(
+    "/{notification_id:uuid}/retry",
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=ApiResponse[NotificationResponse],
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ApiResponse[None],
+            "description": "Notification not found",
+        },
+        status.HTTP_409_CONFLICT: {
+            "model": ApiResponse[None],
+            "description": "Notification cannot be retried",
+        },
+    },
+)
+async def retry_notification(
+    notification_id: UUID,
+    service: Annotated[
+        NotificationService,
+        Depends(get_notification_service),
+    ],
+) -> ApiResponse[NotificationResponse]:
+    notification = await service.retry(notification_id)
+
+    return ApiResponse(
+        data=NotificationResponse.model_validate(notification),
+    )
+
+
 @router.delete(
     "/{notification_id:uuid}",
     response_model=ApiResponse[NotificationResponse],
