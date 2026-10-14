@@ -11,7 +11,10 @@ from notification_service.db.repositories.notification import (
 from notification_service.db.repositories.outbox_event import (
     OutboxEventRepository,
 )
-from notification_service.domain.enums import NotificationChannel, NotificationStatus
+from notification_service.domain.enums import (
+    NotificationChannel,
+    NotificationStatus,
+)
 from notification_service.plugins.registry import PluginRegistry
 from notification_service.services.exceptions import NotificationNotFoundError
 

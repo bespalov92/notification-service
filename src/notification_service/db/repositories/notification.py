@@ -5,7 +5,10 @@ from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from notification_service.db.models.notification import Notification
-from notification_service.domain.enums import NotificationChannel, NotificationStatus
+from notification_service.domain.enums import (
+    NotificationChannel,
+    NotificationStatus,
+)
 
 
 class NotificationRepository:

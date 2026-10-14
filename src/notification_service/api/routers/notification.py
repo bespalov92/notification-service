@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
@@ -12,10 +11,6 @@ from notification_service.api.schemas.notification import (
     CreateNotificationRequest,
     NotificationListParams,
     NotificationResponse,
-)
-from notification_service.domain.enums import (
-    NotificationChannel,
-    NotificationStatus,
 )
 from notification_service.services.notification import NotificationService
 
