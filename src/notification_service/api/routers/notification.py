@@ -8,6 +8,7 @@ from notification_service.api.dependencies import (
 )
 from notification_service.api.schemas.common import ApiResponse
 from notification_service.api.schemas.notification import (
+    ClearQueueResponse,
     CreateNotificationRequest,
     NotificationListParams,
     NotificationResponse,
@@ -135,4 +136,20 @@ async def cancel_notification(
 
     return ApiResponse(
         data=NotificationResponse.model_validate(notification)
+    )
+
+
+@router.delete("", response_model=ApiResponse[ClearQueueResponse])
+async def clear_notification_queue(
+    service: Annotated[
+        NotificationService,
+        Depends(get_notification_service),
+    ],
+) -> ApiResponse[ClearQueueResponse]:
+    cancelled_count = await service.cancel_all_queued()
+
+    return ApiResponse(
+        data=ClearQueueResponse(
+            cancelled_count=cancelled_count,
+        ),
     )

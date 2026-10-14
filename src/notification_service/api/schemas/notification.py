@@ -96,3 +96,10 @@ class NotificationListParams(ApiSchema):
         default=None,
         description="Created at or before this time",
     )
+
+
+class ClearQueueResponse(ApiSchema):
+    cancelled_count: int = Field(
+        ge=0,
+        description="Number of cancelled queued notifications",
+    )

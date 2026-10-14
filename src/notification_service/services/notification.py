@@ -125,3 +125,7 @@ class NotificationService:
             notification.status = NotificationStatus.CANCELLED.value
 
         return notification
+
+    async def cancel_all_queued(self) -> int:
+        async with self._session.begin():
+            return await self._notification_repository.cancel_all_queued()

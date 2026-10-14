@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import ColumnElement, func, select
+from sqlalchemy import ColumnElement, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from notification_service.db.models.notification import Notification
@@ -81,3 +81,15 @@ class NotificationRepository:
         )
 
         return notifications, total or 0
+
+    async def cancel_all_queued(self) -> int:
+        stmt = (
+            update(Notification)
+            .where(Notification.status == NotificationStatus.QUEUED.value)
+            .values(status=NotificationStatus.CANCELLED.value)
+            .returning(Notification.id)
+        )
+
+        cancelled_ids = (await self._session.scalars(stmt)).all()
+
+        return len(cancelled_ids)
