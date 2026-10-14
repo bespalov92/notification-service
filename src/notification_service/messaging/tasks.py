@@ -10,7 +10,7 @@ from notification_service.messaging.celery_app import celery_app
 from notification_service.plugins.fake import FakePlugin
 from notification_service.plugins.registry import PluginRegistry
 from notification_service.services.notification_delivery import (
-    NotificationDeliveryService
+    NotificationDeliveryService,
 )
 from notification_service.services.outbox_relay import OutboxRelayService
 
