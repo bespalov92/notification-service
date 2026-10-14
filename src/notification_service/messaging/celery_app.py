@@ -21,5 +21,16 @@ celery_app.conf.update(
         "notification_service.messaging.deliver_notification": {
             "queue": "notifications",
         },
+        "notification_service.messaging.publish_outbox_events": {
+            "queue": "notifications",
+        },
+    },
+    beat_schedule={
+        "publish-outbox-events": {
+            "task": (
+                "notification_service.messaging.publish_outbox_events"
+            ),
+            "schedule": 1.0,
+        },
     },
 )

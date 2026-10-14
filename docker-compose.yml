@@ -41,6 +41,32 @@ services:
         "--queues=notifications",
       ]
 
+  beat:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    init: true
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      RABBITMQ_HOST: rabbitmq
+      PYTHONPATH: /app/src
+    depends_on:
+      - postgres
+      - rabbitmq
+    volumes:
+      - ./src:/app/src:ro
+    command:
+      [
+        "celery",
+        "-A",
+        "notification_service.messaging.celery_app:celery_app",
+        "beat",
+        "--loglevel=INFO",
+        "--schedule=/tmp/celerybeat-schedule"
+      ]
+
   postgres:
     image: postgres:17-alpine
     environment:
