@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from notification_service.db.models.notification import Notification
@@ -30,3 +30,26 @@ class NotificationRepository:
 
         return await self._session.scalar(stmt)
 
+    async def get_page(
+        self,
+        *,
+        limit: int,
+        offset: int
+    ) -> tuple[list[Notification], int]:
+        stmt = (
+            select(Notification)
+            .order_by(
+                Notification.created_at.desc(),
+                Notification.id.desc()
+            )
+            .limit(limit)
+            .offset(offset)
+        )
+
+        notifications = list((await self._session.scalars(stmt)).all())
+
+        total = await self._session.scalar(
+            select(func.count()).select_from(Notification)
+        )
+
+        return notifications, total or 0

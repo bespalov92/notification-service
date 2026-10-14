@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 
 from notification_service.api.dependencies import (
     get_notification_service,
@@ -46,6 +46,45 @@ async def create_notification(
 
     return ApiResponse(
         data=NotificationResponse.model_validate(notification),
+    )
+
+
+@router.get(
+    "",
+    response_model=ApiResponse[list[NotificationResponse]],
+)
+async def list_notifications(
+    service: Annotated[
+        NotificationService,
+        Depends(get_notification_service),
+    ],
+    limit: int = Query(
+        default=20,
+        ge=1,
+        le=100,
+        description="Maximum number of notifications to return",
+    ),
+    offset: int = Query(
+        default=0,
+        ge=0,
+        description="Number of notifications to skip",
+    ),
+) -> ApiResponse[list[NotificationResponse]]:
+    notifications, total = await service.get_page(
+        limit=limit,
+        offset=offset
+    )
+
+    return ApiResponse(
+        data=[
+            NotificationResponse.model_validate(notification)
+            for notification in notifications
+        ],
+        meta={
+            "limit": limit,
+            "offset": offset,
+            "total": total
+        }
     )
 
 

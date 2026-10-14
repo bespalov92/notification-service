@@ -78,3 +78,14 @@ class NotificationService:
             raise NotificationNotFoundError(notification_id)
 
         return notification
+
+    async def get_page(
+        self,
+        *,
+        limit: int,
+        offset: int,
+    ) -> tuple[list[Notification], int]:
+        return await self._notification_repository.get_page(
+            limit=limit,
+            offset=offset,
+        )
