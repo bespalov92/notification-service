@@ -40,6 +40,9 @@ class NotificationDeliveryService:
             if notification is None:
                 raise NotificationNotFoundError(notification_id)
 
+            if notification.status != NotificationStatus.QUEUED.value:
+                return notification
+
             channel = NotificationChannel(notification.channel)
             payload = notification.payload.copy()
 
