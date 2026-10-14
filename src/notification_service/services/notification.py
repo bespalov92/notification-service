@@ -16,7 +16,10 @@ from notification_service.domain.enums import (
     NotificationStatus,
 )
 from notification_service.plugins.registry import PluginRegistry
-from notification_service.services.exceptions import NotificationNotFoundError
+from notification_service.services.exceptions import (
+    NotificationCannotBeCancelledError,
+    NotificationNotFoundError,
+)
 
 
 class NotificationService:
@@ -100,3 +103,25 @@ class NotificationService:
             created_from=created_from,
             created_to=created_to,
         )
+
+    async def cancel(self, notification_id: UUID) -> Notification:
+        async with self._session.begin():
+            notification = await self._notification_repository.get_by_id(
+                notification_id
+            )
+
+            if notification is None:
+                raise NotificationNotFoundError(notification_id)
+
+            if notification.status == NotificationStatus.CANCELLED.value:
+                return notification
+
+            if notification.status != NotificationStatus.QUEUED.value:
+                raise NotificationCannotBeCancelledError(
+                    notification_id,
+                    notification.status
+                )
+
+            notification.status = NotificationStatus.CANCELLED.value
+
+        return notification

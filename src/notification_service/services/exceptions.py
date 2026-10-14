@@ -19,3 +19,19 @@ class RetryableDeliveryError(NotificationServiceError):
         super().__init__(
             f"Notification {notification_id} delivery can be retried"
         )
+
+
+class NotificationCannotBeCancelledError(NotificationServiceError):
+    """Raised when the current notification status forbids cancellation"""
+
+    def __init__(
+        self,
+        notification_id: UUID,
+        current_status: str,
+    ) -> None:
+        self.notification_id = notification_id
+        self.current_status = current_status
+        super().__init__(
+            f"Notification {notification_id} with status "
+            f"{current_status} cannot be cancelled"
+        )

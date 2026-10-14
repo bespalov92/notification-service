@@ -108,3 +108,31 @@ async def get_notification(
     return ApiResponse(
         data=NotificationResponse.model_validate(notification)
     )
+
+
+@router.delete(
+    "/{notification_id:uuid}",
+    response_model=ApiResponse[NotificationResponse],
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ApiResponse[None],
+            "description": "Notification not found",
+        },
+        status.HTTP_409_CONFLICT: {
+            "model": ApiResponse[None],
+            "description": "Notification cannot be cancelled",
+        },
+    },
+)
+async def cancel_notification(
+    notification_id: UUID,
+    service: Annotated[
+        NotificationService,
+        Depends(get_notification_service),
+    ]
+) -> ApiResponse[NotificationResponse]:
+    notification = await service.cancel(notification_id)
+
+    return ApiResponse(
+        data=NotificationResponse.model_validate(notification)
+    )
