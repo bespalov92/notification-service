@@ -17,6 +17,7 @@ from notification_service.domain.enums import (
 from notification_service.plugins.exceptions import PluginSendError
 from notification_service.plugins.fake import FakePlugin
 from notification_service.plugins.registry import PluginRegistry
+from notification_service.services.exceptions import RetryableDeliveryError
 from notification_service.services.notification_delivery import (
     NotificationDeliveryService,
 )
@@ -107,11 +108,13 @@ async def test_deliver_records_failed_attempt(
         plugin_registry=plugin_registry,
     )
 
-    with pytest.raises(
-        PluginSendError,
-        match="Provider unavailable",
-    ):
-        await service.deliver(notification.id)
+    if retryable:
+        with pytest.raises(RetryableDeliveryError):
+            await service.deliver(notification.id)
+    else:
+        result = await service.deliver(notification.id)
+
+        assert result.status == NotificationStatus.FAILED.value
 
     stored_notification = await db_session.scalar(
         select(Notification).where(

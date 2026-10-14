@@ -15,7 +15,10 @@ from notification_service.domain.enums import (
 )
 from notification_service.plugins.exceptions import PluginSendError
 from notification_service.plugins.registry import PluginRegistry
-from notification_service.services.exceptions import NotificationNotFoundError
+from notification_service.services.exceptions import (
+    NotificationNotFoundError,
+    RetryableDeliveryError,
+)
 
 
 class NotificationDeliveryService:
@@ -51,12 +54,16 @@ class NotificationDeliveryService:
         try:
             await plugin.send(payload)
         except PluginSendError as error:
-            await self._record_failure(
+            can_retry = await self._record_failure(
                 notification,
                 provider_name=plugin.provider_name,
                 error=error
             )
-            raise
+
+            if can_retry:
+                raise RetryableDeliveryError(notification.id) from error
+
+            return notification
 
         await self._record_success(
             notification,
@@ -88,7 +95,7 @@ class NotificationDeliveryService:
         notification: Notification,
         provider_name: str,
         error: PluginSendError
-    ) -> None:
+    ) -> bool:
         async with self._session.begin():
             notification.attempts_count += 1
 
@@ -111,3 +118,5 @@ class NotificationDeliveryService:
                 error=str(error),
             )
             await self._attempt_repository.add(attempt)
+
+        return can_retry

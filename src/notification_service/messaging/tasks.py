@@ -1,6 +1,8 @@
 import asyncio
 from uuid import UUID
 
+from celery import Task
+
 from notification_service.db.session import (
     dispose_database,
     session_maker,
@@ -9,6 +11,7 @@ from notification_service.domain.enums import NotificationChannel
 from notification_service.messaging.celery_app import celery_app
 from notification_service.plugins.fake import FakePlugin
 from notification_service.plugins.registry import PluginRegistry
+from notification_service.services.exceptions import RetryableDeliveryError
 from notification_service.services.notification_delivery import (
     NotificationDeliveryService,
 )
@@ -37,10 +40,15 @@ async def run_delivery(notification_id: UUID) -> None:
 
 
 @celery_app.task(
+    bind=True,
+    max_retries=None,
     name="notification_service.messaging.deliver_notification"
 )
-def deliver_notification(notification_id: str) -> None:
-    asyncio.run(run_delivery(UUID(notification_id)))
+def deliver_notification(self: Task[..., None], notification_id: str) -> None:
+    try:
+        asyncio.run(run_delivery(UUID(notification_id)))
+    except RetryableDeliveryError as error:
+        raise self.retry(exc=error, countdown=5) from error
 
 
 async def publish_delivery_task(notification_id: UUID) -> None:
