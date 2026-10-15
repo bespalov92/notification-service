@@ -9,24 +9,13 @@ from notification_service.db.session import (
     dispose_database,
     session_maker,
 )
-from notification_service.domain.enums import NotificationChannel
 from notification_service.messaging.celery_app import celery_app
-from notification_service.plugins.fake import FakePlugin
-from notification_service.plugins.registry import PluginRegistry
+from notification_service.plugins.registry import build_plugin_registry
 from notification_service.services.exceptions import RetryableDeliveryError
 from notification_service.services.notification_delivery import (
     NotificationDeliveryService,
 )
 from notification_service.services.outbox_relay import OutboxRelayService
-
-
-def build_plugin_registry() -> PluginRegistry:
-    registry = PluginRegistry()
-
-    for channel in NotificationChannel:
-        registry.register(FakePlugin(channel))
-
-    return registry
 
 
 async def run_delivery(notification_id: UUID) -> None:

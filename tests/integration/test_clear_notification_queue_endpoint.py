@@ -18,7 +18,7 @@ async def test_clear_notification_queue(
         response = await api_client.post(
             "/api/v1/notifications",
             json={
-                "channel": "email",
+                "channel": "sms",
                 "idempotencyKey": f"clear-{number}-{uuid4()}",
                 "payload": {"message": f"Message {number}"},
             },

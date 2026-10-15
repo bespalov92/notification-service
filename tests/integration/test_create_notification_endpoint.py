@@ -12,7 +12,7 @@ async def test_create_notification_endpoint(
     db_session: AsyncSession
 ) -> None:
     request_body = {
-        "channel": "email",
+        "channel": "sms",
         "priority": 2,
         "ttl": "01:00:00",
         "idempotencyKey": f"api-{uuid4()}",
@@ -30,7 +30,7 @@ async def test_create_notification_endpoint(
 
     response_body = response.json()
 
-    assert response_body["data"]["channel"] == "email"
+    assert response_body["data"]["channel"] == "sms"
     assert response_body["data"]["status"] == "queued"
     assert response_body["data"]["createdAt"] is not None
     assert response_body["meta"] == {}

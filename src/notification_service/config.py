@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import AmqpDsn, PostgresDsn
+from pydantic import AmqpDsn, PostgresDsn, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -69,11 +69,30 @@ class RabbitMQSettings(BaseSettings):
         )
 
 
+class SMTPSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="SMTP_",
+        extra="ignore",
+    )
+
+    host: str = "mailpit"
+    port: int = 1025
+
+    username: str | None = None
+    password: SecretStr | None = None
+
+    use_tls: bool = False
+    start_tls: bool = False
+    timeout: float = 10.0
+
+
 class Settings:
     def __init__(self) -> None:
         self.application = ApplicationSettings()
         self.postgres = PostgresSettings()
         self.rabbitmq = RabbitMQSettings()
+        self.smtp = SMTPSettings()
 
 
 @lru_cache

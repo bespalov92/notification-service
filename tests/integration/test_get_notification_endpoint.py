@@ -9,7 +9,7 @@ async def test_get_notification(
     create_response = await api_client.post(
         "/api/v1/notifications",
         json={
-            "channel": "email",
+            "channel": "sms",
             "idempotencyKey": f"get-{uuid4()}",
             "payload": {
                 "message": "Hello",

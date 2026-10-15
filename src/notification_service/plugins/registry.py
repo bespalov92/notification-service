@@ -1,9 +1,12 @@
+from notification_service.config import get_settings
 from notification_service.domain.enums import NotificationChannel
 from notification_service.plugins.base import NotificationPlugin
+from notification_service.plugins.email import EmailPlugin
 from notification_service.plugins.exceptions import (
     PluginAlreadyRegisteredError,
     PluginNotFoundError,
 )
+from notification_service.plugins.fake import FakePlugin
 
 
 class PluginRegistry:
@@ -31,3 +34,14 @@ class PluginRegistry:
             raise PluginNotFoundError(channel)
 
         return plugin
+
+
+def build_plugin_registry() -> PluginRegistry:
+    settings = get_settings()
+
+    registry = PluginRegistry()
+    registry.register(EmailPlugin(settings.smtp))
+    registry.register(FakePlugin(NotificationChannel.SMS))
+    registry.register(FakePlugin(NotificationChannel.PUSH))
+
+    return registry

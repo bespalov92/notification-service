@@ -4,19 +4,8 @@ from uuid import uuid4
 import pytest
 from pytest import MonkeyPatch
 
-from notification_service.domain.enums import NotificationChannel
 from notification_service.messaging import tasks
 from notification_service.services.exceptions import RetryableDeliveryError
-
-
-def test_build_plugin_registry_registers_every_channel() -> None:
-    registry = tasks.build_plugin_registry()
-
-    for channel in NotificationChannel:
-        plugin = registry.get(channel)
-
-        assert plugin.channel is channel
-        assert plugin.provider_name == "fake"
 
 
 def test_deliver_notification_runs_async_delivery(

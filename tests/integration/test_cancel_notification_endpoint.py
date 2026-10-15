@@ -13,7 +13,7 @@ async def test_cancel_queued_notification(
     create_response = await api_client.post(
         "/api/v1/notifications",
         json={
-            "channel": "email",
+            "channel": "sms",
             "idempotencyKey": f"cancel-{uuid4()}",
             "payload": {"message": "Cancel me"},
         },
@@ -42,7 +42,7 @@ async def test_cannot_cancel_sent_notification(
     create_response = await api_client.post(
         "/api/v1/notifications",
         json={
-            "channel": "email",
+            "channel": "sms",
             "idempotencyKey": f"sent-{uuid4()}",
             "payload": {"message": "Already sent"},
         },

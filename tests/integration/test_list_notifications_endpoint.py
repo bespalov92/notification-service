@@ -11,7 +11,7 @@ async def test_list_notifications(api_client: AsyncClient) -> None:
         response = await api_client.post(
             "/api/v1/notifications",
             json={
-                "channel": "email",
+                "channel": "sms",
                 "idempotencyKey": f"list-{number}-{uuid4()}",
                 "payload": {
                     "message": f"Message {number}",
@@ -53,7 +53,12 @@ async def test_list_notifications_applies_filters(
         json={
             "channel": "email",
             "idempotencyKey": f"filtered-email-{uuid4()}",
-            "payload": {"message": "Email message"},
+            "payload": {
+                "from": "sender@example.com",
+                "emails": ["user@example.com"],
+                "subject": "Test notification",
+                "message": "Hello!"
+            }
         },
     )
     sms_response = await api_client.post(

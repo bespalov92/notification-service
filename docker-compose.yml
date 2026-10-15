@@ -29,6 +29,7 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+      - mailpit
     volumes:
       - ./src:/app/src:ro
     command:
@@ -88,6 +89,11 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+
+  mailpit:
+    image: axllent/mailpit:v1.27.4
+    ports:
+      - "8025:8025"
 
 volumes:
   postgres_data:
