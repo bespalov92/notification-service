@@ -61,3 +61,16 @@ async def test_cannot_retry_non_failed_notification(
     assert response.json()["error"]["code"] == (
         "notification_cannot_be_retried"
     )
+
+
+async def test_retry_non_existed_notification_returns_not_found(
+    api_client: AsyncClient
+) -> None:
+    non_existed_id = uuid4()
+
+    response = await api_client.post(
+        f"/api/v1/notifications/{non_existed_id}/retry"
+    )
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "notification_not_found"
