@@ -3,7 +3,7 @@ name: notification-service
 services:
   api:
     build:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       context: .
     init: true
     env_file:
