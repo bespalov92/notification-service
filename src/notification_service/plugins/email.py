@@ -4,7 +4,7 @@ import aiosmtplib
 from aiosmtplib.errors import (
     SMTPAuthenticationError,
     SMTPException,
-    SMTPRecipientRefused,
+    SMTPRecipientsRefused,
 )
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, ValidationError
 
@@ -97,7 +97,7 @@ class EmailPlugin:
                 "SMTP authentication failed",
                 retryable=False
             ) from error
-        except SMTPRecipientRefused as error:
+        except SMTPRecipientsRefused as error:
             raise PluginSendError(
                 "SMTP rejected all recipients",
                 retryable=False,
