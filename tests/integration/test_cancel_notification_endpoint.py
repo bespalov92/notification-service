@@ -21,14 +21,14 @@ async def test_cancel_queued_notification(
     notification_id = create_response.json()["data"]["id"]
 
     response = await api_client.delete(
-        f"/api/v1/notifications/{notification_id}"
+        f"/api/v1/notifications/queue/{notification_id}"
     )
 
     assert response.status_code == 200
     assert response.json()["data"]["status"] == "cancelled"
 
     repeated_response = await api_client.delete(
-        f"/api/v1/notifications/{notification_id}"
+        f"/api/v1/notifications/queue/{notification_id}"
     )
 
     assert repeated_response.status_code == 200
@@ -58,7 +58,7 @@ async def test_cannot_cancel_sent_notification(
         notification.status = NotificationStatus.SENT.value
 
     response = await api_client.delete(
-        f"/api/v1/notifications/{notification_id}"
+        f"/api/v1/notifications/queue/{notification_id}"
     )
 
     assert response.status_code == 409

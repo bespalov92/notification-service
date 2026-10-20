@@ -46,7 +46,7 @@ async def test_clear_notification_queue(
             )
         )
 
-    response = await api_client.delete("/api/v1/notifications")
+    response = await api_client.delete("/api/v1/notifications/queue")
 
     assert response.status_code == 200
     assert response.json()["data"]["cancelledCount"] == queued_before

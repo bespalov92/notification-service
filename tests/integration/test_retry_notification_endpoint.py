@@ -33,7 +33,7 @@ async def test_retry_failed_notification(
     notification_id = notification.id
 
     response = await api_client.post(
-        f"/api/v1/notifications/{notification_id}/retry"
+        f"/api/v1/notifications/failed/{notification_id}/retry"
     )
 
     assert response.status_code == 202
@@ -54,7 +54,7 @@ async def test_cannot_retry_non_failed_notification(
     notification_id = notification.id
 
     response = await api_client.post(
-        f"/api/v1/notifications/{notification_id}/retry"
+        f"/api/v1/notifications/failed/{notification_id}/retry"
     )
 
     assert response.status_code == 409
@@ -69,7 +69,7 @@ async def test_retry_non_existed_notification_returns_not_found(
     non_existed_id = uuid4()
 
     response = await api_client.post(
-        f"/api/v1/notifications/{non_existed_id}/retry"
+        f"/api/v1/notifications/failed/{non_existed_id}/retry"
     )
 
     assert response.status_code == 404

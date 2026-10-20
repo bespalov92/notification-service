@@ -63,7 +63,7 @@ class NotificationResponse(ApiSchema):
     )
 
 
-class NotificationListParams(ApiSchema):
+class NotificationQueueParams(ApiSchema):
     limit: int = Field(
         default=20,
         ge=1,
@@ -80,11 +80,6 @@ class NotificationListParams(ApiSchema):
     channel: NotificationChannel | None = Field(
         default=None,
         description="Filter by delivery channel",
-    )
-
-    status: NotificationStatus | None = Field(
-        default=None,
-        description="Filter by current status",
     )
 
     created_from: datetime | None = Field(

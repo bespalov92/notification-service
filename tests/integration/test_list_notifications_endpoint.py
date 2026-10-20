@@ -23,7 +23,7 @@ async def test_list_notifications(api_client: AsyncClient) -> None:
         created_ids.add(response.json()["data"]["id"])
 
     response = await api_client.get(
-        "/api/v1/notifications",
+        "/api/v1/notifications/queue",
         params={
             "limit": 100,
             "offset": 0,
@@ -77,10 +77,9 @@ async def test_list_notifications_applies_filters(
     sms_data = sms_response.json()["data"]
 
     response = await api_client.get(
-        "/api/v1/notifications",
+        "/api/v1/notifications/queue",
         params={
             "channel": "email",
-            "status": "queued",
             "createdFrom": email_data["createdAt"],
             "createdTo": sms_data["createdAt"],
             "limit": 100,

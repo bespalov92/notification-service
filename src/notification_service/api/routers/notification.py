@@ -10,9 +10,10 @@ from notification_service.api.schemas.common import ApiResponse
 from notification_service.api.schemas.notification import (
     ClearQueueResponse,
     CreateNotificationRequest,
-    NotificationListParams,
+    NotificationQueueParams,
     NotificationResponse,
 )
+from notification_service.domain.enums import NotificationStatus
 from notification_service.services.notification import NotificationService
 
 router = APIRouter(prefix="/api/v1/notifications", tags=["notifications"])
@@ -52,16 +53,16 @@ async def create_notification(
 
 
 @router.get(
-    "",
+    "/queue",
     response_model=ApiResponse[list[NotificationResponse]],
 )
-async def list_notifications(
+async def list_notifications_queue(
     service: Annotated[
         NotificationService,
         Depends(get_notification_service),
     ],
     params: Annotated[
-        NotificationListParams,
+        NotificationQueueParams,
         Query()
     ]
 ) -> ApiResponse[list[NotificationResponse]]:
@@ -69,7 +70,7 @@ async def list_notifications(
         limit=params.limit,
         offset=params.offset,
         channel=params.channel,
-        status=params.status,
+        status=NotificationStatus.QUEUED,
         created_from=params.created_from,
         created_to=params.created_to,
     )
@@ -112,7 +113,7 @@ async def get_notification(
 
 
 @router.post(
-    "/{notification_id:uuid}/retry",
+    "/failed/{notification_id:uuid}/retry",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=ApiResponse[NotificationResponse],
     responses={
@@ -141,7 +142,7 @@ async def retry_notification(
 
 
 @router.delete(
-    "/{notification_id:uuid}",
+    "/queue/{notification_id:uuid}",
     response_model=ApiResponse[NotificationResponse],
     responses={
         status.HTTP_404_NOT_FOUND: {
@@ -168,7 +169,7 @@ async def cancel_notification(
     )
 
 
-@router.delete("", response_model=ApiResponse[ClearQueueResponse])
+@router.delete("/queue", response_model=ApiResponse[ClearQueueResponse])
 async def clear_notification_queue(
     service: Annotated[
         NotificationService,
